@@ -48,7 +48,7 @@ const addFavoriteCity = async (req, res) => {
         const favoriteCity = req.body;
 
         const { id, favoriteCities, name, email } = await userRepository.put(
-            { id: userId },
+            { _id: userId },
             { $push: { favoriteCities: favoriteCity } },
         );
 
