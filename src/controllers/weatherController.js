@@ -29,6 +29,43 @@ const getWeatherFavoriteCity = async (req, res) => {
     }
 };
 
+const getWeather = async (req, res) => {
+    try {
+        const { latitude, longitude, cityName, cityId } = req.query;
+
+        if ((!latitude || !longitude) && !cityName && !cityId) {
+            return res.status(400).json({
+                message: 'You need to inform at least one of this params to get the weather: (latitude and longitude), cityName, cityId',
+            });
+        }
+
+        if (latitude && longitude) {
+            const { results } = await weather.getWeatherByLatitudeAndLongitude(latitude, longitude);
+
+            return res.status(200).json(results);
+        }
+
+        if (cityName) {
+            const { results } = await weather.getWeatherByCityName(cityName);
+
+            return res.status(200).json(results);
+        }
+
+        if (cityId) {
+            const { results } = await weather.getWeatherByCityId(cityId);
+
+            return res.status(200).json(results);
+        }
+
+        return res.status(204).send();
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     getWeatherFavoriteCity,
+    getWeather,
 };

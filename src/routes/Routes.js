@@ -12,7 +12,7 @@ router.post('/users/favorite-city', authService.verify, userController.addFavori
 router.delete('/users/favorite-city/:cityId', authService.verify, userController.removeFavoriteCity);
 
 // weather
-// router.get('/weather', weatherController.getWeather);
+router.get('/weather', weatherController.getWeather);
 router.get('/user/favorite-city/weather', authService.verify, weatherController.getWeatherFavoriteCity);
 
 //auth
