@@ -15,6 +15,7 @@ const get = async (req, res) => {
             id: user?.id,
             name: user?.name,
             email: user?.email,
+            favoriteCities: user?.favoriteCities,
         });
 
     } catch (error) {
@@ -32,6 +33,7 @@ const getAll = async (req, res) => {
             id: user?.id,
             name: user?.name,
             email: user?.email,
+            favoriteCities: user?.favoriteCities,
         }));
 
         res.status(200).json(result);

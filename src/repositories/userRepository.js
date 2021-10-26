@@ -9,7 +9,7 @@ const create = async user => User.create(user);
 const put = async (query = {}, values = {}) => User.findOneAndUpdate(query, values, { new: true });
 
 const get = async () => {
-    const data = await User.find({}, 'id name email');
+    const data = await User.find({}, 'id name email favoriteCities');
     return data;
 };
 
