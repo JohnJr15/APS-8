@@ -60,8 +60,27 @@ const addFavoriteCity = async (req, res) => {
     }
 };
 
+const removeFavoriteCity = async (req, res) => {
+    try {
+        const { userId } = req;
+        const { cityId } = req.params;
+
+        const { id, favoriteCities, name, email } = await userRepository.put(
+            { _id: userId },
+            { $pull: { favoriteCities: { cityId: +cityId } } },
+        );
+
+        res.status(200).json({ id, name, email, favoriteCities });
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message,
+        });
+    }
+};
+
 module.exports = {
     get,
     getAll,
     addFavoriteCity,
+    removeFavoriteCity,
 };

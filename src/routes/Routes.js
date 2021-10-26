@@ -9,6 +9,7 @@ const authService = require('../services/jwtService');
 router.get('/user/:id', authService.verify, userController.get);
 router.get('/users', authService.verify, userController.getAll);
 router.post('/users/favorite-city', authService.verify, userController.addFavoriteCity);
+router.delete('/users/favorite-city/:cityId', authService.verify, userController.removeFavoriteCity);
 
 // weather
 // router.get('/weather', authService.verify, weatherController.getWeatherFavoriteCity);
