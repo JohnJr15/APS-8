@@ -13,10 +13,16 @@ const get = async () => {
     return data;
 };
 
+const getWithFilter = async filter => {
+    const data = await User.findOne(filter, 'id name email favoriteCities');
+    return data;
+};
+
 module.exports = {
     getById,
     getByEmail,
     create,
     put,
     get,
+    getWithFilter,
 };

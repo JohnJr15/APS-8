@@ -1,6 +1,5 @@
 const userRepository = require('../repositories/userRepository');
-const crypto = require('../services/cryptoService');
-const jwt = require('../services/jwtService');
+const { crypto, jwt } = require('../services');
 
 const signUp = async (req, res) => {
     try {

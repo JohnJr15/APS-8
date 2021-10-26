@@ -1,4 +1,4 @@
-const crypto = require('../services/cryptoService');
+const crypto = require('./cryptoService');
 const { security } = require('../../config');
 const jwt = require('jsonwebtoken');
 
