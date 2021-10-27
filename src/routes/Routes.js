@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authController = require('../controllers/authController');
 const weatherController = require('../controllers/weatherController');
+const cityController = require('../controllers/cityController');
 const { jwt: authService } = require('../services');
 
 //user
@@ -14,6 +15,9 @@ router.delete('/users/favorite-city/:cityId', authService.verify, userController
 // weather
 router.get('/weather', weatherController.getWeather);
 router.get('/user/favorite-city/weather', authService.verify, weatherController.getWeatherFavoriteCity);
+
+// city
+router.get('/cities/city', cityController.getCityIdFromCityName);
 
 //auth
 router.post('/auth/signup', authController.signUp);

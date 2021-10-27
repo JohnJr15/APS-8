@@ -18,9 +18,16 @@ const getWeatherServiceData = () => ({
   xApiKey: process.env.WEATHER_SERVICE_X_API_KEY,
 });
 
+const getCityServiceData = () => ({
+  url: process.env.CITY_SERVICE_URL,
+  xApiKey: process.env.CITY_SERVICE_X_API_KEY,
+});
+
+
 module.exports = {
   application: getApplicationData(),
   security: getSecurityData(),
   mongo: getMongoData(),
   weatherService: getWeatherServiceData(),
+  cityService: getCityServiceData(),
 };
