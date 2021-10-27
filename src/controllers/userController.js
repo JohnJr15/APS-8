@@ -41,7 +41,7 @@ const getAll = async (req, res) => {
             favoriteCities: user?.favoriteCities,
         }));
 
-        res.status(200).json(result);
+        return res.status(200).json(result);
     } catch (error) {
         return res.status(500).json({
             message: error.message,
@@ -63,7 +63,7 @@ const addFavoriteCity = async (req, res) => {
         const { favoriteCities: oldFavoriteCities } = await userRepository.getWithFilter({ _id: userId });
 
         if (oldFavoriteCities.length >= 5) {
-            res.status(400).json({ message: 'You cannot add more than 5 cities to the favorites. Please remove one and try again' });
+            return res.status(400).json({ message: 'You cannot add more than 5 cities to the favorites. Please remove one and try again' });
         }
 
         const { id, favoriteCities, name, email } = await userRepository.put(
@@ -71,7 +71,7 @@ const addFavoriteCity = async (req, res) => {
             { $push: { favoriteCities: favoriteCity } },
         );
 
-        res.status(200).json({ id, name, email, favoriteCities });
+        return res.status(200).json({ id, name, email, favoriteCities });
     } catch (error) {
         return res.status(500).json({
             message: error.message,
@@ -93,7 +93,7 @@ const removeFavoriteCity = async (req, res) => {
             { $pull: { favoriteCities: { cityId: +cityId } } },
         );
 
-        res.status(200).json({ id, name, email, favoriteCities });
+        return res.status(200).json({ id, name, email, favoriteCities });
     } catch (error) {
         return res.status(500).json({
             message: error.message,
