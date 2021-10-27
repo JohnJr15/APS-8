@@ -66,6 +66,12 @@ const addFavoriteCity = async (req, res) => {
             return res.status(400).json({ message: 'You cannot add more than 5 cities to the favorites. Please remove one and try again' });
         }
 
+        const cityAlreadyIsFavorite = oldFavoriteCities.find(city => city.cityId === cityId);
+
+        if (cityAlreadyIsFavorite) {
+            return res.status(400).json({ message: `The city: ${cityName} - id: ${cityId} already is favorite. Please try again with another city` });
+        }
+
         const { id, favoriteCities, name, email } = await userRepository.put(
             { _id: userId },
             { $push: { favoriteCities: favoriteCity } },
