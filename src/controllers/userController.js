@@ -3,6 +3,11 @@ const userRepository = require('../repositories/userRepository');
 const get = async (req, res) => {
     try {
         const id = req.params.id;
+
+        if (!id) {
+            return res.status(400).json({ message: 'You must inform the id to find a user' });
+        }
+
         const user = await userRepository.getById(id);
 
         if (!user) {
@@ -47,7 +52,13 @@ const getAll = async (req, res) => {
 const addFavoriteCity = async (req, res) => {
     try {
         const { userId } = req;
-        const favoriteCity = req.body;
+        const { cityName, cityId } = req.body;
+
+        const favoriteCity = { name: cityName, cityId };
+
+        if (!cityName || !cityId) {
+            return res.status(400).json({ message: 'You must inform the cityName and cityId to add a city to the favorite cities' });
+        }
 
         const { favoriteCities: oldFavoriteCities } = await userRepository.getWithFilter({ _id: userId });
 
@@ -72,6 +83,10 @@ const removeFavoriteCity = async (req, res) => {
     try {
         const { userId } = req;
         const { cityId } = req.params;
+
+        if (!cityId) {
+            return res.status(400).json({ message: 'You must inform the cityId to remove it from the favorite cities' });
+        }
 
         const { id, favoriteCities, name, email } = await userRepository.put(
             { _id: userId },

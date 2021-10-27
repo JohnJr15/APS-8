@@ -3,7 +3,11 @@ const { crypto, jwt } = require('../services');
 
 const signUp = async (req, res) => {
     try {
-        const { email: userEmail } = req.body;
+        const { name: userName, email: userEmail, password: userPassword } = req.body;
+        if (!userName || !userEmail || !userPassword) {
+            return res.status(400).json({ message: 'You must inform the name, email and password to create a user' });
+        }
+
         let user = await userRepository.getByEmail(userEmail);
 
         if (user) return res.status(409).json({ message: 'E-mail already exists!' });
@@ -34,6 +38,10 @@ const signUp = async (req, res) => {
 const signIn = async (req, res) => {
     try {
         const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ message: 'You must inform the email and password sign in' });
+        }
 
         const user = await userRepository.getByEmail(email);
 
