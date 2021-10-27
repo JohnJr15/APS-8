@@ -1,21 +1,29 @@
 const userRepository = require('../repositories/userRepository');
 const { crypto, jwt } = require('../services');
+const { v4: uuidV4 } = require('uuid');
 
 const signUp = async (req, res) => {
     try {
         const { name: userName, email: userEmail, password: userPassword } = req.body;
+
         if (!userName || !userEmail || !userPassword) {
             return res.status(400).json({ message: 'You must inform the name, email and password to create a user' });
         }
 
-        let user = await userRepository.getByEmail(userEmail);
+        const userAlreadyExists = await userRepository.getByEmail(userEmail);
 
-        if (user) return res.status(409).json({ message: 'E-mail already exists!' });
+        if (userAlreadyExists) return res.status(409).json({ message: 'E-mail already exists!' });
 
-        user = req.body;
-        user = await userRepository.create(user);
-        user.token = jwt.generateToken({ id: user.id });
-        await userRepository.put({ _id: user._id }, { $set: { token: user.token } });
+        const userId = uuidV4();
+        const userToken = jwt.generateToken({ id: userId });
+
+        const user = await userRepository.create({
+            id: userId,
+            name: userName,
+            email: userEmail,
+            password: userPassword,
+            token: userToken,
+        });
 
         const { id, name, email, createdAt, updatedAt, token } = user;
 
