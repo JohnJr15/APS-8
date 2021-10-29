@@ -9,7 +9,7 @@ const { jwt: authService } = require('../services');
 //user
 router.get('/user/:id', authService.verify, userController.get);
 router.get('/users', authService.verify, userController.getAll);
-router.post('/users/favorite-city', authService.verify, userController.addFavoriteCity);
+router.patch('/users/favorite-city', authService.verify, userController.addFavoriteCity);
 router.delete('/users/favorite-city/:cityId', authService.verify, userController.removeFavoriteCity);
 
 // weather
