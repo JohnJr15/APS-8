@@ -1,8 +1,8 @@
 const { createLogger, format, transports } = require('winston');
 const { combine, timestamp, printf, prettyPrint } = format;
 
-const myFormat = printf(({ level, message, timestamp, stack }) => {
-    return `${timestamp} - ${level.toUpperCase()}: ${message} ${stack ? `
+const myFormat = printf(({ level, message, timestamp, stack, breakLine }) => {
+    return `${breakLine || ''}${timestamp} - ${level.toUpperCase()}: ${message} ${stack ? `
     Error Stack : ${stack}` : ''}`;
 });
 

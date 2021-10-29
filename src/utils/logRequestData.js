@@ -1,7 +1,10 @@
 const { logInfo } = require('../services');
 
 const logRequestData = (req, res, next) => {
-    logInfo(`Request from Host: ${req.headers?.host} | Agent: ${req.headers?.['user-agent']}`);
+    logInfo({
+        message: `Request from Host: ${req.headers?.host} | Agent: ${req.headers?.['user-agent']}`,
+        breakLine: '\n',
+    });
 
     return next();
 };
