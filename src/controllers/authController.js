@@ -1,18 +1,29 @@
-const userRepository = require('../repositories/userRepository');
-const { crypto, jwt } = require('../services');
 const { v4: uuidV4 } = require('uuid');
+
+const userRepository = require('../repositories/userRepository');
+const { crypto, jwt, logError, logInfo } = require('../services');
+const {
+    EMAIL_ALREADY_EXISTS,
+    USER_OR_PASSWORD_INCORRECT,
+    SIGN_UP_INVALID_PARAMETERS,
+    SIGN_IN_INVALID_PARAMETERS,
+} = require('../../enum');
 
 const signUp = async (req, res) => {
     try {
         const { name: userName, email: userEmail, password: userPassword } = req.body;
 
         if (!userName || !userEmail || !userPassword) {
-            return res.status(400).json({ message: 'You must inform the name, email and password to create a user' });
+            logError(`400 - ${SIGN_UP_INVALID_PARAMETERS}`);
+            return res.status(400).json({ message: SIGN_UP_INVALID_PARAMETERS });
         }
 
         const userAlreadyExists = await userRepository.getByEmail(userEmail);
 
-        if (userAlreadyExists) return res.status(409).json({ message: 'E-mail already exists!' });
+        if (userAlreadyExists) {
+            logError(`409 - ${EMAIL_ALREADY_EXISTS}`);
+            return res.status(409).json({ message: EMAIL_ALREADY_EXISTS });
+        }
 
         const userId = uuidV4();
         const userToken = jwt.generateToken({ id: userId });
@@ -27,6 +38,8 @@ const signUp = async (req, res) => {
 
         const { id, name, email, createdAt, updatedAt, token } = user;
 
+        logInfo(`201 - User: ${name} created succesfully!`);
+
         return res.status(201).json({
             id,
             name,
@@ -37,6 +50,7 @@ const signUp = async (req, res) => {
         });
 
     } catch (error) {
+        logError(error);
         return res.status(500).json({
             message: error.message,
         });
@@ -48,15 +62,20 @@ const signIn = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ message: 'You must inform the email and password sign in' });
+            logError(`400 - ${SIGN_IN_INVALID_PARAMETERS}`);
+            return res.status(400).json({ message: SIGN_IN_INVALID_PARAMETERS });
         }
 
         const user = await userRepository.getByEmail(email);
 
-        if (!user) return res.status(404).json({ message: 'User or password incorrect!' });
+        if (!user) {
+            logError(`401 - ${USER_OR_PASSWORD_INCORRECT}`);
+            return res.status(401).json({ message: USER_OR_PASSWORD_INCORRECT });
+        }
 
         if (crypto.decrypt(user.password) !== password) {
-            return res.status(401).json({ message: 'User or password incorrect!' });
+            logError(`401 - ${USER_OR_PASSWORD_INCORRECT}`);
+            return res.status(401).json({ message: USER_OR_PASSWORD_INCORRECT });
         }
         user.token = jwt.generateToken(
             { id: user._id },
@@ -66,6 +85,8 @@ const signIn = async (req, res) => {
             { _id: user._id },
             { $set: { token: user.token } },
         );
+
+        logInfo(`200 - User: ${user.name} logged in successfully!`);
 
         return res.status(200).json({
             id: user.id,
@@ -78,6 +99,7 @@ const signIn = async (req, res) => {
         });
 
     } catch (error) {
+        logError(error);
         return res.status(500).json({
             message: error.message,
         });

@@ -3,3 +3,4 @@ node_modules
 .env
 .vscode
 .nyc_output
+/logs

@@ -1,21 +1,33 @@
 const userRepository = require('../repositories/userRepository');
+const { logError, logInfo } = require('../services');
+const {
+    USER_NOT_FOUND,
+    CITY_ALREADY_FAVORITE,
+    FIND_USER_INVALID_PARAMETERS,
+    FAVORITE_CITIES_LIMIT_REACHED,
+    ADD_FAVORITE_CITY_INVALID_PARAMETERS,
+    REMOVE_FAVORITE_CITY_INVALID_PARAMETERS,
+} = require('../../enum');
 
 const get = async (req, res) => {
     try {
         const id = req.params.id;
 
         if (!id) {
-            return res.status(400).json({ message: 'You must inform the id to find a user' });
+            logError(`400 - ${FIND_USER_INVALID_PARAMETERS}`);
+            return res.status(400).json({ message: FIND_USER_INVALID_PARAMETERS });
         }
 
         const user = await userRepository.getById(id);
 
         if (!user) {
+            logError(`404 - ${USER_NOT_FOUND}`);
             return res.status(404).json({
-                message: 'User not found!',
+                message: USER_NOT_FOUND,
             });
         }
 
+        logInfo(`200 - User: ${user.name} found`);
         return res.status(200).json({
             id: user?.id,
             name: user?.name,
@@ -24,6 +36,7 @@ const get = async (req, res) => {
         });
 
     } catch (error) {
+        logError(error);
         return res.status(500).json({
             message: error.message,
         });
@@ -41,8 +54,10 @@ const getAll = async (req, res) => {
             favoriteCities: user?.favoriteCities,
         }));
 
+        logInfo('200 - Get All Users');
         return res.status(200).json(result);
     } catch (error) {
+        logError(error);
         return res.status(500).json({
             message: error.message,
         });
@@ -57,19 +72,26 @@ const addFavoriteCity = async (req, res) => {
         const favoriteCity = { name: cityName, cityId };
 
         if (!cityName || !cityId) {
-            return res.status(400).json({ message: 'You must inform the cityName and cityId to add a city to the favorite cities' });
+            logError(`400 - ${ADD_FAVORITE_CITY_INVALID_PARAMETERS}`);
+            return res.status(400).json({ message: ADD_FAVORITE_CITY_INVALID_PARAMETERS });
         }
 
         const { favoriteCities: oldFavoriteCities } = await userRepository.getWithFilter({ _id: userId });
 
         if (oldFavoriteCities.length >= 5) {
-            return res.status(400).json({ message: 'You cannot add more than 5 cities to the favorites. Please remove one and try again' });
+            logError(`400 - ${FAVORITE_CITIES_LIMIT_REACHED}`);
+            return res.status(400).json({ message: FAVORITE_CITIES_LIMIT_REACHED });
         }
 
         const cityAlreadyIsFavorite = oldFavoriteCities.find(city => city.cityId === cityId);
 
         if (cityAlreadyIsFavorite) {
-            return res.status(400).json({ message: `The city: ${cityName} - id: ${cityId} already is favorite. Please try again with another city` });
+            logError(`400 - ${CITY_ALREADY_FAVORITE.replace('{{cityName}}', cityName).replace('{{cityId}}', cityId)}`);
+            return res.status(400).json({
+                message: CITY_ALREADY_FAVORITE
+                    .replace('{{cityName}}', cityName)
+                    .replace('{{cityId}}', cityId),
+            });
         }
 
         const { id, favoriteCities, name, email } = await userRepository.put(
@@ -77,8 +99,10 @@ const addFavoriteCity = async (req, res) => {
             { $push: { favoriteCities: favoriteCity } },
         );
 
+        logInfo(`200 - City: ${cityName} added to the favorite cities of ${name}`);
         return res.status(200).json({ id, name, email, favoriteCities });
     } catch (error) {
+        logError(error);
         return res.status(500).json({
             message: error.message,
         });
@@ -91,7 +115,8 @@ const removeFavoriteCity = async (req, res) => {
         const { cityId } = req.params;
 
         if (!cityId) {
-            return res.status(400).json({ message: 'You must inform the cityId to remove it from the favorite cities' });
+            logError(`400 - ${REMOVE_FAVORITE_CITY_INVALID_PARAMETERS}`);
+            return res.status(400).json({ message: REMOVE_FAVORITE_CITY_INVALID_PARAMETERS });
         }
 
         const { id, favoriteCities, name, email } = await userRepository.put(
@@ -99,8 +124,10 @@ const removeFavoriteCity = async (req, res) => {
             { $pull: { favoriteCities: { cityId: +cityId } } },
         );
 
+        logInfo(`200 - City: ${cityId} removed from the favorite cities of ${name}`);
         return res.status(200).json({ id, name, email, favoriteCities });
     } catch (error) {
+        logError(error);
         return res.status(500).json({
             message: error.message,
         });
