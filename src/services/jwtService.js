@@ -1,7 +1,7 @@
 const crypto = require('./cryptoService');
 const { security } = require('../../config');
 const jwt = require('jsonwebtoken');
-const { logError } = require('.');
+const { logger: { error: logError } } = require('./loggerService');
 
 const generateToken = (params = {}, keys = security) => {
     try {
